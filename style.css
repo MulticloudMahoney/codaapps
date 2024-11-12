@@ -1,0 +1,8 @@
+/* Custom styles can be added here if needed */
+body {
+    padding-bottom: 50px;
+}
+
+textarea {
+    resize: vertical;
+}

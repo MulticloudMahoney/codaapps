@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bulk URL Text Extractor</title>
+    <link rel="stylesheet" href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">Bulk URL Text Extractor</h1>
+        <form action="/" method="post">
+            <div class="mb-3">
+                <label for="urls" class="form-label">Enter URLs (one per line, max 50):</label>
+                <textarea class="form-control" id="urls" name="urls" rows="10" required></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="output_format" class="form-label">Output Format:</label>
+                <select class="form-select" id="output_format" name="output_format">
+                    <option value="txt">TXT</option>
+                    <option value="json">JSON</option>
+                    <option value="jsonl">JSONL</option>
+                    <option value="md">Markdown</option>
+                    <option value="html">HTML</option>
+                </select>
+            </div>
+            <div class="accordion mb-3" id="selectorAccordion">
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#customSelectors">
+                            Custom CSS Selectors (Optional)
+                        </button>
+                    </h2>
+                    <div id="customSelectors" class="accordion-collapse collapse">
+                        <div class="accordion-body">
+                            <div class="mb-3">
+                                <label for="content_selector_type" class="form-label">Content Selector:</label>
+                                <select class="form-select" size="8" id="content_selector_type" name="content_selector_type[]" multiple>
+                                    <option value="h1">h1 (Heading 1)</option>
+                                    <option value="title">title (Page Title)</option>
+                                    <option value="h2">h2 (Heading 2)</option>
+                                    <option value="h3">h3 (Heading 3)</option>
+                                    <option value="h4">h4 (Heading 4)</option>
+                                    <option value="h5">h5 (Heading 5)</option>
+                                    <option value="h6">h6 (Heading 6)</option>
+                                    <option value="p">p (Paragraphs)</option>
+                                    <option value="article">article (Article content)</option>
+                                    <option value="main">main (Main content)</option>
+                                    <option value="div">div (Generic divisions)</option>
+                                    <option value="span">span (Inline text)</option>
+                                    <option value="custom">Custom (specify selector)</option>
+                                </select>
+                                <div id="custom_selector_input" class="mt-2 d-none">
+                                    <input type="text" class="form-control" id="content_selector" name="content_selector" 
+                                           placeholder="Enter custom selector (e.g., .content, #main-content)">
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="code_selector" class="form-label">Code Block Selector:</label>
+                                <input type="text" class="form-control" id="code_selector" name="code_selector" 
+                                       placeholder="e.g., pre, code, .highlight">
+                            </div>
+                            <div class="mb-3">
+                                <label for="exclude_selector" class="form-label">Exclude Selector:</label>
+                                <input type="text" class="form-control" id="exclude_selector" name="exclude_selector" 
+                                       placeholder="e.g., .ads, .comments, nav">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#filteringOptions">
+                            Filtering Options (Optional)
+                        </button>
+                    </h2>
+                    <div id="filteringOptions" class="accordion-collapse collapse">
+                        <div class="accordion-body">
+                            <div class="mb-3">
+                                <label for="search_query" class="form-label">Search Query:</label>
+                                <input type="text" class="form-control" id="search_query" name="search_query" 
+                                       placeholder="Enter text to search for in content">
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="min_length" class="form-label">Minimum Length:</label>
+                                    <input type="number" class="form-control" id="min_length" name="min_length" 
+                                           placeholder="Min characters" min="0">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="max_length" class="form-label">Maximum Length:</label>
+                                    <input type="number" class="form-control" id="max_length" name="max_length" 
+                                           placeholder="Max characters" min="0">
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="contains_text" class="form-label">Contains Text:</label>
+                                <input type="text" class="form-control" id="contains_text" name="contains_text" 
+                                       placeholder="Content must contain this text">
+                            </div>
+                            <div class="mb-3">
+                                <label for="excludes_text" class="form-label">Excludes Text:</label>
+                                <input type="text" class="form-control" id="excludes_text" name="excludes_text" 
+                                       placeholder="Content must not contain this text">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Extract Text</button>
+        </form>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('content_selector_type').addEventListener('change', function() {
+            const customInput = document.getElementById('custom_selector_input');
+            const contentSelector = document.getElementById('content_selector');
+            
+            // Check if 'custom' is among the selected options
+            const hasCustom = Array.from(this.selectedOptions).some(option => option.value === 'custom');
+            
+            if (hasCustom) {
+                customInput.classList.remove('d-none');
+                contentSelector.required = true;
+            } else {
+                customInput.classList.add('d-none');
+                contentSelector.required = false;
+                contentSelector.value = '';
+                // Join selected values with comma
+                const selectedValues = Array.from(this.selectedOptions)
+                    .filter(option => option.value !== 'custom')
+                    .map(option => option.value);
+                document.getElementById('content_selector').value = selectedValues.join(', ');
+            }
+        });
+    </script>
+</body>
+</html>

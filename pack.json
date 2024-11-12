@@ -1,0 +1,233 @@
+{
+  "name": "Bulk URL Content Extractor",
+  "description": "Extract and organize content from multiple URLs with support for custom selectors and sub-page generation",
+  "version": "1.0.0",
+  "author": {
+    "name": "URL Content Extractor Team",
+    "email": "support@urlextractor.com"
+  },
+  "homepage": "https://github.com/url-extractor/coda-pack",
+  "license": "MIT",
+  "categories": ["Content Management", "Productivity", "Web Tools"],
+  "tags": ["url", "content", "extraction", "web scraping", "automation"],
+  "icon": "generated-icon.png",
+  "codaVersion": ">=1.4.0",
+  "formulas": [
+    {
+      "name": "ExtractContent",
+      "description": "Extract content from multiple URLs with enhanced CSS selector support",
+      "parameters": [
+        {
+          "name": "urls",
+          "description": "List of URLs to extract content from",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "content_selector",
+          "description": "CSS selector(s) for content. Can be a single selector string or array of selectors",
+          "type": ["string", "array"],
+          "items": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        {
+          "name": "code_selector",
+          "description": "CSS selector for code blocks",
+          "type": "string",
+          "optional": true
+        },
+        {
+          "name": "exclude_selector",
+          "description": "CSS selector for content to exclude",
+          "type": "string",
+          "optional": true
+        }
+      ],
+      "returnType": "object",
+      "examples": [
+        {
+          "params": {
+            "urls": ["https://example.com/article"],
+            "content_selector": "article"
+          },
+          "result": {
+            "https://example.com/article": "Example article content..."
+          }
+        }
+      ]
+    },
+    {
+      "name": "PreviewContent",
+      "description": "Preview extracted content with metadata before generating pages",
+      "parameters": [
+        {
+          "name": "urls",
+          "description": "List of URLs to process",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "content_selector",
+          "description": "CSS selector(s) for content. Can be a single selector string or array of selectors",
+          "type": ["string", "array"],
+          "items": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        {
+          "name": "code_selector",
+          "description": "CSS selector for code blocks",
+          "type": "string",
+          "optional": true
+        },
+        {
+          "name": "exclude_selector",
+          "description": "CSS selector for content to exclude",
+          "type": "string",
+          "optional": true
+        },
+        {
+          "name": "max_preview_length",
+          "description": "Maximum length of content preview",
+          "type": "number",
+          "optional": true
+        }
+      ],
+      "returnType": "object",
+      "examples": [
+        {
+          "params": {
+            "urls": ["https://example.com/article"],
+            "max_preview_length": 200
+          },
+          "result": {
+            "https://example.com/article": {
+              "status": "success",
+              "preview": "Example preview content...",
+              "content_length": 500,
+              "has_more": true
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "GenerateSubPage",
+      "description": "Generate a sub-page with extracted content using customizable templates",
+      "parameters": [
+        {
+          "name": "doc_id",
+          "description": "Coda document ID",
+          "type": "string"
+        },
+        {
+          "name": "page_name",
+          "description": "Name for the new page",
+          "type": "string"
+        },
+        {
+          "name": "content",
+          "description": "Dictionary of URL to content mappings",
+          "type": "object"
+        },
+        {
+          "name": "template_type",
+          "description": "Template type to use (article, code, documentation, blog)",
+          "type": "string",
+          "optional": true
+        }
+      ],
+      "returnType": "string",
+      "examples": [
+        {
+          "params": {
+            "doc_id": "abc123",
+            "page_name": "Extracted Content",
+            "content": {
+              "https://example.com/article": "Example content..."
+            },
+            "template_type": "article"
+          },
+          "result": "https://coda.io/d/abc123/p/xyz789"
+        }
+      ]
+    },
+    {
+      "name": "BatchExtractAndGenerate",
+      "description": "Batch extract content and generate multiple sub-pages with template support",
+      "parameters": [
+        {
+          "name": "doc_id",
+          "description": "Coda document ID",
+          "type": "string"
+        },
+        {
+          "name": "urls",
+          "description": "List of URLs to process",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "base_page_name",
+          "description": "Base name for generated pages",
+          "type": "string",
+          "optional": true
+        },
+        {
+          "name": "content_selector",
+          "description": "CSS selector(s) for content. Can be a single selector string or array of selectors",
+          "type": ["string", "array"],
+          "items": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        {
+          "name": "code_selector",
+          "description": "CSS selector for code blocks",
+          "type": "string",
+          "optional": true
+        },
+        {
+          "name": "exclude_selector",
+          "description": "CSS selector for content to exclude",
+          "type": "string",
+          "optional": true
+        },
+        {
+          "name": "template_type",
+          "description": "Template type to use (article, code, documentation, blog)",
+          "type": "string",
+          "optional": true
+        }
+      ],
+      "returnType": "array",
+      "examples": [
+        {
+          "params": {
+            "doc_id": "abc123",
+            "urls": ["https://example.com/article1", "https://example.com/article2"],
+            "base_page_name": "Batch Content"
+          },
+          "result": [
+            "https://coda.io/d/abc123/p/xyz789",
+            "https://coda.io/d/abc123/p/xyz790"
+          ]
+        }
+      ]
+    }
+  ],
+  "networkDomains": [
+    "*.coda.io",
+    "*"
+  ]
+}
